@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f3202837-af8a-469e-98e6-dcf96e02a807" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="helloworldFlow" doc:id="f5dab700-cec2-4c65-908f-c17730720b9a" >
+		<http:listener doc:name="Listener" doc:id="80f17bda-f665-469d-8575-cae4a37b9c3f" config-ref="HTTP_Listener_config" path="/world"/>
+		<set-payload value="#[%dw 2.0 output application/java --- [1,2,3,4,5,6,7,8,9,10]]" doc:name="Set Payload" doc:id="82fd4703-208d-4e0a-8953-cdcb667edefe" />
+		<batch:job jobName="helloworldBatch_Job" doc:id="23c59dfc-50c1-4be9-af9b-d805889472f9" >
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="e379241f-8f23-4194-93ef-fa26d89c8020" >
+					<ee:transform doc:name="Transform Message" doc:id="dc987341-ac42-467a-815d-ee2f95faa7f7" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+(payload * 3)]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</batch:step>
+			</batch:process-records>
+		</batch:job>
+		<ee:transform doc:name="Transform Message" doc:id="e2f215f4-6f80-467a-9a9a-15e385d53195" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
